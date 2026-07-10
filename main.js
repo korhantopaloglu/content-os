@@ -84,3 +84,52 @@ function testCompleteStoryPackJob(jobId) {
   }
   return result;
 }
+
+function testNormalizeSlackInput() {
+  const cases = [
+  {
+    input: '<https://photos.google.com/album/abc|photos.google.com/album/abc>',
+    expected: 'https://photos.google.com/album/abc',
+  },
+  {
+    input: '<https://drive.google.com/drive/folders/abc>',
+    expected: 'https://drive.google.com/drive/folders/abc',
+  },
+  {
+    input: 'My Folder Name',
+    expected: 'My Folder Name',
+  },
+  ];
+
+  const results = cases.map(function (testCase) {
+    const actual = normalizeSlackInput_(testCase.input);
+    const passed = actual === testCase.expected;
+    Logger.log((passed ? 'PASS' : 'FAIL') + ': ' + testCase.input + ' => ' + actual);
+    return {
+      input: testCase.input,
+      expected: testCase.expected,
+      actual: actual,
+      passed: passed,
+    };
+  });
+
+  return results;
+}
+
+function testCreatePhotosGoogleComAlbum() {
+  const slackWrapped = '<https://photos.google.com/album/abc123|photos.google.com/album/abc123>';
+  const normalized = normalizeSlackInput_(slackWrapped);
+  const isPhotosUrl = isGooglePhotosAlbumUrl_(normalized);
+  const resolved = resolveSourceInputForCreate_(normalized);
+
+  Logger.log('normalized: ' + normalized);
+  Logger.log('isGooglePhotosAlbumUrl_: ' + isPhotosUrl);
+  Logger.log('resolved: ' + JSON.stringify(resolved));
+
+  return {
+    normalized: normalized,
+    isPhotosUrl: isPhotosUrl,
+    resolved: resolved,
+    passed: isPhotosUrl && resolved.ok && resolved.sourceType === 'GooglePhotosAlbum',
+  };
+}

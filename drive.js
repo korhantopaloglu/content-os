@@ -25,7 +25,8 @@ function isGoogleDriveFolderUrl_(text) {
 }
 
 function isGooglePhotosAlbumUrl_(text) {
-  return /photos\.app\.goo\.gl/i.test(text);
+  return /photos\.app\.goo\.gl/i.test(text) ||
+    /photos\.google\.com/i.test(text);
 }
 
 function getDriveFolderUrl_(folderId) {

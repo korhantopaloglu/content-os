@@ -117,8 +117,27 @@ function handleVideoCommand(args, context) {
   return 'Unknown video command. Use: create, process, or status';
 }
 
+function normalizeSlackInput_(text) {
+  const trimmed = (text || '').trim();
+  if (!trimmed) {
+    return trimmed;
+  }
+
+  const withLabel = trimmed.match(/^<([^>|]+)\|[^>]+>$/);
+  if (withLabel) {
+    return withLabel[1].trim();
+  }
+
+  const urlOnly = trimmed.match(/^<([^>]+)>$/);
+  if (urlOnly) {
+    return urlOnly[1].trim();
+  }
+
+  return trimmed;
+}
+
 function handleVideoCreateCommand_(args, context) {
-  const sourceInput = args.join(' ').trim();
+  const sourceInput = normalizeSlackInput_(args.join(' ').trim());
 
   if (!sourceInput) {
     return 'Usage: /cos -v create <driveFolderUrl|photosAlbumUrl|sourceFolderName>';
